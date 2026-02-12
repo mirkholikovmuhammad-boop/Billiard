@@ -1,152 +1,118 @@
-document.addEventListener('DOMContentLoaded', function() {
-
-let seconds = [0,0,0,0];
-let intervals = [null,null,null,null];
-const prices = [20,20,30,30];
-let history = [];
-let calendarHistory = {}; // сохраняем прибыль по дате
-
-function round2(num){
-    return Math.round(num*100)/100;
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
 }
 
-// расчет цены по минутам
-function calcPrice(sec, tableIndex){
-    let minutes = Math.floor(sec/60);
-    let total = 0;
-    if(minutes <=5) total = 1.7;
-    else if(minutes <=10) total = 3;
-    else if(minutes <=15) total = 5;
-    else total = prices[tableIndex]*(sec/3600);
-    return round2(total);
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-function updateTimer(index){
-    seconds[index] += 1;
-
-    let hrs = Math.floor(seconds[index] / 3600);
-    let mins = Math.floor((seconds[index] % 3600) / 60);
-    let secs = seconds[index] % 60;
-
-    let text = '';
-    if (hrs > 0) {
-        text = `${hrs}ч ${mins}мин`;
-    } else {
-        text = `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    document.getElementById(`timer${index+1}`).textContent = text;
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-
-function addHistory(table, durationSec, total){
-    history.push({table: table, durationSec: durationSec, total: total});
-    renderHistory();
-    updateTodayTotal();
-    // сохраняем в календарь по дате
-    let today = new Date().toISOString().split('T')[0];
-    if(!calendarHistory[today]) calendarHistory[today]=0;
-    calendarHistory[today] = round2(calendarHistory[today]+total);
+header #todayTotal {
+    font-weight: bold;
+    font-size: 1.2em;
 }
 
-function renderHistory(){
-    let list = document.getElementById('historyList');
-    list.innerHTML = '';
-    history.forEach(item=>{
-        let hrs = Math.floor(item.durationSec/3600);
-        let mins = Math.floor((item.durationSec%3600)/60);
-        let timeText = '';
-        if(hrs>0) timeText += `${hrs}ч `;
-        if(mins>0) timeText += `${mins}мин`;
-        let li = document.createElement('li');
-        li.textContent = `Стол ${item.table}: ${timeText} = ${item.total} сомони`;
-        list.appendChild(li);
-    });
+button {
+    padding: 10px 15px;
+    font-size: 1em;
+    border-radius: 5px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-function updateTodayTotal(){
-    let total = history.reduce((sum,item)=>sum+item.total,0);
-    document.getElementById('todayTotal').textContent = `За сегодня: ${round2(total)} сомони`;
+button:hover {
+    background-color: #45a049;
 }
 
-// Таймеры с одной кнопкой
-for(let i=0;i<4;i++){
-    let tableDiv = document.getElementById(`table${i+1}`);
-    let btn = document.getElementById(`btn${i+1}`);
-
-    btn.addEventListener('click',()=>{
-        if(btn.textContent === 'Старт'){
-            btn.textContent = 'Стоп';
-            tableDiv.classList.add('active');
-            clearInterval(intervals[i]);
-            intervals[i] = setInterval(()=>updateTimer(i),1000);
-        } else {
-            clearInterval(intervals[i]);
-            tableDiv.classList.remove('active');
-            let total = calcPrice(seconds[i], i);
-            document.getElementById(`price${i+1}`).textContent = `${total} сомони`;
-            addHistory(i+1, seconds[i], total);
-            seconds[i]=0;
-            document.getElementById(`timer${i+1}`).textContent = '0:00';
-            btn.textContent = 'Старт';
-        }
-    });
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-// Закончить день
-document.getElementById('endDay').addEventListener('click',()=>{
-    let totalDay = history.reduce((sum,item)=>sum+item.total,0);
-    document.getElementById('totalDay').textContent = round2(totalDay) + " сомони";
-    document.getElementById('editTotal').value = round2(totalDay);
-    document.getElementById('endDayModal').style.display = 'block';
-});
-
-document.getElementById('saveTotal').addEventListener('click',()=>{
-    let edited = parseFloat(document.getElementById('editTotal').value);
-    if(!isNaN(edited)){
-        document.getElementById('totalDay').textContent = round2(edited) + " сомони";
-        // сброс
-        history=[];
-        seconds=[0,0,0,0];
-        for(let i=0;i<4;i++){
-            clearInterval(intervals[i]);
-            intervals[i]=null;
-            document.getElementById(`timer${i+1}`).textContent='0:00';
-            document.getElementById(`price${i+1}`).textContent='0.00 сомони';
-            document.getElementById(`btn${i+1}`).textContent='Старт';
-            document.getElementById(`table${i+1}`).classList.remove('active');
-        }
-        updateTodayTotal();
-        document.getElementById('endDayModal').style.display='none';
-    }
-});
-
-// Календарь
-let calendarIndex = 0; // 0 = сегодня
-document.getElementById('calendarBtn').addEventListener('click',()=>{
-    document.getElementById('calendarModal').style.display='block';
-    renderCalendar();
-});
-document.getElementById('closeCalendar').addEventListener('click',()=>{
-    document.getElementById('calendarModal').style.display='none';
-});
-
-document.getElementById('prevDay').addEventListener('click',()=>{
-    calendarIndex++;
-    renderCalendar();
-});
-document.getElementById('nextDay').addEventListener('click',()=>{
-    calendarIndex = Math.max(0, calendarIndex-1);
-    renderCalendar();
-});
-
-function renderCalendar(){
-    let date = new Date();
-    date.setDate(date.getDate()-calendarIndex);
-    let dateStr = date.toLocaleDateString();
-    document.getElementById('calendarDate').textContent = dateStr;
-    let total = calendarHistory[date.toISOString().split('T')[0]] || 0;
-    document.getElementById('calendarTotal').textContent = round2(total) + " сомони";
+.container-top,
+.container-bottom {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 20px;
 }
 
-});
+.table {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.table.active {
+    background-color: #b3ffb3;
+}
+
+.timer {
+    font-size: 2em;
+    margin: 10px 0;
+}
+
+.price {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+#history {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+ul { padding-left: 20px; }
+
+li { margin-bottom: 5px; }
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.calendar-content { width: 250px; }
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
