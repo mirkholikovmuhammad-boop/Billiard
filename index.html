@@ -3,66 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Billiard Timer</title>
+    <title>Бильярдная - Учет</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
 <header>
-    <h1>Billiard</h1>
-    <div class="header-right">
+    <div class="header-top">
+        <h1>Бильярдная</h1>
+        <button id="calendarBtn" class="secondary-btn">📅 Календарь</button>
+    </div>
+    <div class="header-status">
         <span id="todayTotal">За сегодня: 0 сом.</span>
-        <button onclick="document.getElementById('endDayModal').style.display='block'" style="width: auto; padding: 10px;">Завершить</button>
+        <button id="endDayBtn" class="danger-btn">Завершить день</button>
     </div>
 </header>
 
 <main>
-    <div class="container-top">
+    <div class="tables-grid">
         <div class="table" id="table1">
-            <h2>Стол 1 (М)</h2>
+            <h2>Стол 1 (Майда)</h2>
             <div class="timer" id="timer1">0:00</div>
-            <button id="btn1">Старт</button>
+            <button class="start-btn" id="btn1">Старт</button>
         </div>
         <div class="table" id="table2">
-            <h2>Стол 2 (М)</h2>
+            <h2>Стол 2 (Майда)</h2>
             <div class="timer" id="timer2">0:00</div>
-            <button id="btn2">Старт</button>
+            <button class="start-btn" id="btn2">Старт</button>
         </div>
-    </div>
-    <div class="container-bottom">
         <div class="table" id="table3">
-            <h2>Стол 3 (К)</h2>
+            <h2>Стол 3 (Калон)</h2>
             <div class="timer" id="timer3">0:00</div>
-            <button id="btn3">Старт</button>
+            <button class="start-btn" id="btn3">Старт</button>
         </div>
         <div class="table" id="table4">
-            <h2>Стол 4 (К)</h2>
+            <h2>Стол 4 (Калон)</h2>
             <div class="timer" id="timer4">0:00</div>
-            <button id="btn4">Старт</button>
+            <button class="start-btn" id="btn4">Старт</button>
         </div>
     </div>
 
-    <div id="history">
-        <h3>История за сегодня:</h3>
+    <section id="history">
+        <h3>📜 История игр:</h3>
         <ul id="historyList"></ul>
-    </div>
+    </section>
 </main>
 
 <div id="endDayModal" class="modal">
     <div class="modal-content">
-        <h2>Завершить день?</h2>
-        <p>Весь список очистится, а сумма сохранится в историю.</p>
-        <button id="saveTotal">Да, завершить</button>
-        <button onclick="document.getElementById('endDayModal').style.display='none'" style="background: #ccc; margin-top: 10px;">Отмена</button>
+        <h2>Завершить смену?</h2>
+        <p>Данные за сегодня будут сохранены в календарь, а текущий список очистится.</p>
+        <button id="saveTotal" class="confirm-btn">Да, сохранить</button>
+        <button id="closeModal" class="cancel-btn">Отмена</button>
     </div>
 </div>
 
 <script src="script.js"></script>
-<script>
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("sw.js").catch(() => {});
-    }
-</script>
 </body>
 </html>
