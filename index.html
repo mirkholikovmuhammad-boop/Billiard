@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Billiard Pro</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
@@ -46,7 +47,6 @@
             <button class="start-btn" id="btn4">Старт</button>
         </div>
     </div>
-
     <section id="history">
         <h3>📜 История игр:</h3>
         <ul id="historyList"></ul>
@@ -56,7 +56,6 @@
 <div id="endDayModal" class="modal">
     <div class="modal-content">
         <h2>Завершить смену?</h2>
-        <p>Выручка сохранится в календарь.</p>
         <button id="saveTotal" class="confirm-btn">Да, завершить</button>
         <button id="closeModal" class="cancel-btn">Отмена</button>
     </div>
@@ -66,13 +65,19 @@
     <div class="modal-content">
         <h2>История по дням</h2>
         <ul id="calendarList" style="text-align: left; max-height: 250px; overflow-y: auto; padding: 0; list-style: none;"></ul>
-        <button id="closeCalendar" class="cancel-btn" style="margin-top:15px;">Закрыть</button>
+        <button id="closeCalendar" class="cancel-btn">Закрыть</button>
     </div>
 </div>
 
 <script src="script.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log("Оффлайн режим готов!"))
+      .catch((err) => console.log("Ошибка:", err));
+  }
+</script>
 </body>
-</html>
 </html>
 
 
