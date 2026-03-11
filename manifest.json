@@ -1,14 +1,14 @@
 {
-  "name": "Billiard Timer",
   "short_name": "Billiard",
-  "start_url": "index.html",
+  "name": "Billiard Timer Pro",
+  "start_url": "./index.html",
   "display": "standalone",
+  "theme_color": "#4CAF50",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "icon.png",
-      "sizes": "192x192",
+      "src": "https://cdn-icons-png.flaticon.com/512/528/528105.png",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]
