@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Бильярдная - Учет</title>
+    <title>Billiard Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
         <button id="calendarBtn" class="secondary-btn">📅 Календарь</button>
     </div>
     <div class="header-status">
-        <span id="todayTotal">За сегодня: 0 сом.</span>
+        <span id="todayTotal">За сегодня: 0.00 сом.</span>
         <button id="endDayBtn" class="danger-btn">Завершить день</button>
     </div>
 </header>
@@ -52,12 +52,25 @@
 <div id="endDayModal" class="modal">
     <div class="modal-content">
         <h2>Завершить смену?</h2>
-        <p>Данные за сегодня будут сохранены в календарь, а текущий список очистится.</p>
+        <p>Список очистится, сумма уйдет в календарь.</p>
         <button id="saveTotal" class="confirm-btn">Да, сохранить</button>
         <button id="closeModal" class="cancel-btn">Отмена</button>
+    </div>
+</div>
+
+<div id="calendarModal" class="modal">
+    <div class="modal-content">
+        <h2>История по дням</h2>
+        <ul id="calendarList" style="text-align: left; max-height: 300px; overflow-y: auto;"></ul>
+        <button id="closeCalendar" class="cancel-btn" style="margin-top:15px;">Закрыть</button>
     </div>
 </div>
 
 <script src="script.js"></script>
 </body>
 </html>
+
+<script src="script.js"></script>
+</body>
+</html>
+
