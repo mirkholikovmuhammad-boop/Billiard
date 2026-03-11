@@ -1,2 +1,2 @@
 # Billiard
-Таймер билярда от Nurik09 
+Nurmuhammad 
