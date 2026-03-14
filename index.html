@@ -15,8 +15,8 @@
         <button id="calendarBtn" class="secondary-btn">📅 Календарь</button>
     </div>
     <div class="header-status">
-        <span id="todayTotal">За сегодня: 0.00 сом.</span>
-        <button id="endDayBtn" class="danger-btn">Завершить</button>
+        <span id="todayTotal">За сегодня: 0 сом.</span>
+        <button id="endDayBtn" class="danger-btn">Сброс</button>
     </div>
 </header>
 
@@ -25,38 +25,48 @@
         <div class="table" id="table1">
             <h2>Стол 1 (Майда)</h2>
             <div class="timer" id="timer1">0:00</div>
-            <div class="last-bill" id="bill1">К оплате: 0.00 сом.</div>
+            <div class="last-bill" id="bill1">К оплате: 0 сом.</div>
             <button class="start-btn" id="btn1">Старт</button>
         </div>
         <div class="table" id="table2">
-            <h2>Стол 2 (Майда)</h2>
+            <h2>Стол 2 (Калон)</h2>
             <div class="timer" id="timer2">0:00</div>
-            <div class="last-bill" id="bill2">К оплате: 0.00 сом.</div>
+            <div class="last-bill" id="bill2">К оплате: 0 сом.</div>
             <button class="start-btn" id="btn2">Старт</button>
         </div>
         <div class="table" id="table3">
             <h2>Стол 3 (Калон)</h2>
             <div class="timer" id="timer3">0:00</div>
-            <div class="last-bill" id="bill3">К оплате: 0.00 сом.</div>
+            <div class="last-bill" id="bill3">К оплате: 0 сом.</div>
             <button class="start-btn" id="btn3">Старт</button>
         </div>
         <div class="table" id="table4">
-            <h2>Стол 4 (Калон)</h2>
+            <h2>Стол 4 (Майда)</h2>
             <div class="timer" id="timer4">0:00</div>
-            <div class="last-bill" id="bill4">К оплате: 0.00 сом.</div>
+            <div class="last-bill" id="bill4">К оплате: 0 сом.</div>
             <button class="start-btn" id="btn4">Старт</button>
         </div>
     </div>
+
     <section id="history">
-        <h3>📜 История игр:</h3>
+        <div class="history-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3>📜 История:</h3>
+            <select id="historyFilter" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+                <option value="today">Сегодня</option>
+                <option value="yesterday">Вчера</option>
+                <option value="week">Неделя</option>
+                <option value="month">Месяц</option>
+            </select>
+        </div>
         <ul id="historyList"></ul>
     </section>
 </main>
 
 <div id="endDayModal" class="modal">
     <div class="modal-content">
-        <h2>Завершить смену?</h2>
-        <button id="saveTotal" class="confirm-btn">Да, завершить</button>
+        <h2>Очистить историю?</h2>
+        <p>Это удалит все записи игр из текущего списка.</p>
+        <button id="saveTotal" class="confirm-btn">Да, очистить</button>
         <button id="closeModal" class="cancel-btn">Отмена</button>
     </div>
 </div>
@@ -72,13 +82,8 @@
 <script src="script.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log("Оффлайн режим готов!"))
-      .catch((err) => console.log("Ошибка:", err));
+    navigator.serviceWorker.register('./sw.js').catch((err) => console.log("SW Error:", err));
   }
 </script>
 </body>
 </html>
-
-
-
