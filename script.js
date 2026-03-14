@@ -2,16 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let startTimes = JSON.parse(localStorage.getItem('startTimes')) || [null, null, null, null];
     let active = JSON.parse(localStorage.getItem('active')) || [false, false, false, false];
     let allGames = JSON.parse(localStorage.getItem('allGames')) || [];
-    let calendarHistory = JSON.parse(localStorage.getItem('calendarHistory')) || {};
     
     let intervals = [null, null, null, null];
-    const prices = [20, 30, 30, 20]; // 1-Майда, 2-Калон, 3-Калон, 4-Майда
+    const prices = [20, 30, 30, 20]; // 1-М, 2-К, 3-К, 4-М
 
     const save = () => {
         localStorage.setItem('startTimes', JSON.stringify(startTimes));
         localStorage.setItem('active', JSON.stringify(active));
         localStorage.setItem('allGames', JSON.stringify(allGames));
-        localStorage.setItem('calendarHistory', JSON.stringify(calendarHistory));
     };
 
     const updateUI = (i) => {
@@ -48,77 +46,85 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.textContent = 'Старт';
                 document.getElementById(`table${i+1}`).classList.remove('active');
                 
-                // Математическое округление
                 let finalTotal = Math.round(prices[i] * (totalSeconds / 3600));
                 document.getElementById(`bill${i+1}`).textContent = `К оплате: ${finalTotal} сом.`;
 
                 if (totalSeconds > 10) {
-                    const now = new Date();
-                    const gameData = {
-                        table: i + 1,
-                        type: (i === 0 || i === 3) ? 'Майда' : 'Калон',
+                    allGames.push({
                         total: finalTotal,
                         timestamp: Date.now(),
-                        timeStr: now.getHours() + ":" + now.getMinutes().toString().padStart(2,'0')
-                    };
-                    allGames.unshift(gameData);
-                    
-                    let dateKey = now.toLocaleDateString();
-                    calendarHistory[dateKey] = (calendarHistory[dateKey] || 0) + finalTotal;
+                        dateStr: new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
+                    });
                 }
                 document.getElementById(`timer${i+1}`).textContent = "0:00";
                 startTimes[i] = null;
-                renderHistory();
+                renderTodayList();
             }
             save();
         };
     }
 
-    function renderHistory() {
-        const filter = document.getElementById('historyFilter').value;
+    // Список игр внизу (только за сегодня)
+    function renderTodayList() {
         const list = document.getElementById('historyList');
-        const totalDisp = document.getElementById('todayTotal');
-        const now = new Date();
+        const today = new Date().toLocaleDateString('en-CA');
+        const todayGames = allGames.filter(g => g.dateStr === today);
         
+        list.innerHTML = todayGames.slice().reverse().map(g => {
+            const time = new Date(g.timestamp);
+            return `<li>[${time.getHours()}:${time.getMinutes().toString().padStart(2,'0')}] Заработано: <b>${g.total} сом.</b></li>`;
+        }).join('') || '<li>Сегодня игр еще не было</li>';
+
+        let sum = todayGames.reduce((s, g) => s + g.total, 0);
+        document.getElementById('todayTotal').textContent = `За сегодня: ${sum} сом.`;
+    }
+
+    // Календарь / Статистика
+    const calculateStats = () => {
+        const period = document.getElementById('statsPeriod').value;
+        const picker = document.getElementById('datePicker');
+        const now = new Date();
+        let total = 0;
+
         const filtered = allGames.filter(game => {
             const gameDate = new Date(game.timestamp);
             const diffDays = (now - gameDate) / (1000 * 60 * 60 * 24);
-            if (filter === 'today') return gameDate.toDateString() === now.toDateString();
-            if (filter === 'yesterday') {
+
+            if (period === 'today') return gameDate.toDateString() === now.toDateString();
+            if (period === 'yesterday') {
                 const yest = new Date(); yest.setDate(now.getDate() - 1);
                 return gameDate.toDateString() === yest.toDateString();
             }
-            if (filter === 'week') return diffDays <= 7;
-            if (filter === 'month') return diffDays <= 30;
-            return true;
+            if (period === 'week') return diffDays <= 7;
+            if (period === 'month') return diffDays <= 30;
+            if (period === 'custom') return game.dateStr === picker.value;
+            return false;
         });
 
-        list.innerHTML = filtered.map(g => 
-            `<li>[${g.timeStr}] Стол ${g.table} (${g.type}): <b>${g.total} сом.</b></li>`
-        ).join('') || '<li>История пуста</li>';
-
-        let sum = filtered.reduce((s, g) => s + g.total, 0);
-        totalDisp.textContent = `Итого: ${sum} сом.`;
-    }
-
-    document.getElementById('historyFilter').onchange = renderHistory;
-    
-    // Модалки
-    document.getElementById('calendarBtn').onclick = () => {
-        const calList = document.getElementById('calendarList');
-        calList.innerHTML = Object.keys(calendarHistory).reverse().map(date => 
-            `<li style="padding:8px 0; border-bottom:1px solid #eee;">${date}: <b>${calendarHistory[date]} сом.</b></li>`
-        ).join('') || 'Пусто';
-        document.getElementById('calendarModal').style.display = 'block';
+        total = filtered.reduce((s, g) => s + g.total, 0);
+        document.getElementById('bigTotal').textContent = `${total} сом.`;
     };
 
+    document.getElementById('calendarBtn').onclick = () => {
+        document.getElementById('calendarModal').style.display = 'block';
+        calculateStats();
+    };
+
+    document.getElementById('statsPeriod').onchange = (e) => {
+        document.getElementById('customDateContainer').style.display = (e.target.value === 'custom') ? 'block' : 'none';
+        calculateStats();
+    };
+
+    document.getElementById('datePicker').onchange = calculateStats;
     document.getElementById('closeCalendar').onclick = () => document.getElementById('calendarModal').style.display = 'none';
+    
+    // Сброс (очистка всей базы)
     document.getElementById('endDayBtn').onclick = () => document.getElementById('endDayModal').style.display = 'block';
     document.getElementById('closeModal').onclick = () => document.getElementById('endDayModal').style.display = 'none';
     document.getElementById('saveTotal').onclick = () => {
-        allGames = []; save(); renderHistory();
+        allGames = []; save(); renderTodayList();
         document.getElementById('endDayModal').style.display = 'none';
     };
 
-    renderHistory();
+    renderTodayList();
 });
