@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Billiard Pro</title>
+    <title>Billiard Management Pro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
 
 <header>
     <div class="header-top">
         <h1>Бильярдная</h1>
-        <button id="calendarBtn" class="secondary-btn">📅 Календарь</button>
+        <button id="calendarBtn" class="secondary-btn">📅 Календарь / Доход</button>
     </div>
     <div class="header-status">
         <span id="todayTotal">За сегодня: 0 сом.</span>
@@ -23,25 +26,32 @@
 <main>
     <div class="tables-grid">
         <div class="table" id="table1">
-            <h2>Стол 1 (Майда)</h2>
+            <div class="badge badge-maida">Майда</div>
+            <h2>Стол 1</h2>
             <div class="timer" id="timer1">0:00</div>
             <div class="last-bill" id="bill1">К оплате: 0 сом.</div>
             <button class="start-btn" id="btn1">Старт</button>
         </div>
+
         <div class="table" id="table2">
-            <h2>Стол 2 (Калон)</h2>
+            <div class="badge badge-kalon">Калон</div>
+            <h2>Стол 2</h2>
             <div class="timer" id="timer2">0:00</div>
             <div class="last-bill" id="bill2">К оплате: 0 сом.</div>
             <button class="start-btn" id="btn2">Старт</button>
         </div>
+
         <div class="table" id="table3">
-            <h2>Стол 3 (Калон)</h2>
+            <div class="badge badge-kalon">Калон</div>
+            <h2>Стол 3</h2>
             <div class="timer" id="timer3">0:00</div>
             <div class="last-bill" id="bill3">К оплате: 0 сом.</div>
             <button class="start-btn" id="btn3">Старт</button>
         </div>
+
         <div class="table" id="table4">
-            <h2>Стол 4 (Майда)</h2>
+            <div class="badge badge-maida">Майда</div>
+            <h2>Стол 4</h2>
             <div class="timer" id="timer4">0:00</div>
             <div class="last-bill" id="bill4">К оплате: 0 сом.</div>
             <button class="start-btn" id="btn4">Старт</button>
@@ -49,41 +59,61 @@
     </div>
 
     <section id="history">
-        <div class="history-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3>📜 История:</h3>
-            <select id="historyFilter" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
-                <option value="today">Сегодня</option>
-                <option value="yesterday">Вчера</option>
-                <option value="week">Неделя</option>
-                <option value="month">Месяц</option>
-            </select>
-        </div>
-        <ul id="historyList"></ul>
+        <h3>📜 Игры за сегодня:</h3>
+        <ul id="historyList">
+            <li>Игр пока нет</li>
+        </ul>
     </section>
 </main>
 
+<div id="calendarModal" class="modal">
+    <div class="modal-content">
+        <h2 style="margin-top:0">Аналитика дохода</h2>
+        
+        <div class="filter-box">
+            <label for="statsPeriod">Период:</label>
+            <select id="statsPeriod">
+                <option value="today">Сегодня</option>
+                <option value="yesterday">Вчера</option>
+                <option value="week">Последняя неделя</option>
+                <option value="month">Последний месяц</option>
+                <option value="custom">Своя дата (выбрать)</option>
+            </select>
+        </div>
+
+        <div id="customDateContainer" style="display: none; margin: 15px 0;">
+            <input type="date" id="datePicker" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+
+        <div class="earnings-display">
+            <span style="display: block; font-size: 0.9rem; color: #666;">Сумма дохода за период:</span>
+            <div id="bigTotal" style="font-size: 2.8rem; font-weight: bold; color: #2ecc71;">0 сом.</div>
+        </div>
+
+        <button id="closeCalendar" class="cancel-btn">Закрыть окно</button>
+    </div>
+</div>
+
 <div id="endDayModal" class="modal">
     <div class="modal-content">
-        <h2>Очистить историю?</h2>
-        <p>Это удалит все записи игр из текущего списка.</p>
-        <button id="saveTotal" class="confirm-btn">Да, очистить</button>
+        <h2>Очистить всю базу?</h2>
+        <p>Внимание! Будет удалена вся история игр и статистика из памяти. Это нельзя отменить.</p>
+        <button id="saveTotal" class="confirm-btn">Да, удалить всё</button>
         <button id="closeModal" class="cancel-btn">Отмена</button>
     </div>
 </div>
 
-<div id="calendarModal" class="modal">
-    <div class="modal-content">
-        <h2>История по дням</h2>
-        <ul id="calendarList" style="text-align: left; max-height: 250px; overflow-y: auto; padding: 0; list-style: none;"></ul>
-        <button id="closeCalendar" class="cancel-btn">Закрыть</button>
-    </div>
-</div>
-
 <script src="script.js"></script>
+
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch((err) => console.log("SW Error:", err));
-  }
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('PWA активен!', reg.scope))
+                .catch(err => console.log('Ошибка SW:', err));
+        });
+    }
 </script>
+
 </body>
 </html>
